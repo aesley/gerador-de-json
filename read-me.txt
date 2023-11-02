@@ -1,0 +1,12 @@
+- Atividade: Desenvolver o Modelo JSON em Java, que tera sua saída gerada através do console;
+	- Metodologia da atividade: 
+
+		1 Imagem em anexo com o contexto da atividade;
+		2 Levantar as informações e definições necessarias para gerar JSON
+		3 Descreve o modelo de Json com suas caracterisitcas;
+		4 Modelo em txt disponível na raiz do projeto com o nome modelo-de-json;
+		5 Gerar o modelo de json a partir do console do sistema;
+
+- Objetivo: JSON será utilizado como modelo para alimentar a IA;
+
+
