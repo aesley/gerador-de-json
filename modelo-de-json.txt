@@ -1,58 +1,50 @@
-    {
-        "context": {
-            "imports": {
-                "java": [
-                    "entrada de texto",
-                    "entrada de texto",
-                    "entrada de texto",
-                ]
-            },
-            "source": {
-                "url": "entrada de texto",
-                "language": "pt-br",
-                "html": "entrada de texto"
-            },
-            "intents": [
-                {
-                    "intent": "entrada de texto",
-                    "intent-generated": "entrada de texto",
-                    "code": {
-                        "selenium": {
-                            "java": [
-                                "entrada de texto"
-                            ]
-                        }
-                    },
-                    "entities": {
-                        "target": [
-                            {
-                                "entrada de texto"
-                            }
-                        ],
-                        "related": []
-                    },
-                    "values": {}
-                },
-                {
-                    "intent": "entrada de texto",
-                    "intent-generated": "entrada de texto",
-                    "code": {
-                        "selenium": {
-                            "java": [
-                                "entrada de texto"
-                            ]
-                        }
-                    },
-                    "entities": {
-                        "target": [
-                            {
-                                "entrada de texto"
-                            }
-                        ],
-                        "related": []
-                    },
-                    "values": {}
-                }
+{
+    "context": {
+        "imports": {
+            "java": [
+                "entrada de texto",
+                "entrada de texto",
+                "entrada de texto"
             ]
-        }
+        },
+        "source": {
+            "url": "entrada de texto",
+            "language": "pt-br",
+            "html": "entrada de texto"
+        },
+        "intents": [
+            {
+                "intent": "entrada de texto",
+                "intent-generated": "entrada de texto",
+                "code": {
+                    "selenium": {
+                        "java": [
+                            "entrada de texto"
+                        ]
+                    }
+                },
+                "entities": {
+                    "target": ["entrada de texto"],
+                    "related": []
+                },
+                "values": {}
+            },
+            {
+                "intent": "entrada de texto",
+                "intent-generated": "entrada de texto",
+                "code": {
+                    "selenium": {
+                        "java": [
+                            "entrada de texto"
+                        ]
+                    }
+                },
+                "entities": {
+                    "target": ["entrada de texto"],
+                    "related": []
+                },
+                "values": {}
+            }
+        ]
     }
+}

@@ -5,100 +5,123 @@ import java.util.*;
 public class JSONGenerator {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Map<String, Object> context = new HashMap<>();
-        Map<String, Object> imports = new HashMap<>();
-        Map<String, Object> source = new HashMap<>();
-        List<Map<String, Object>> intents = new ArrayList<>();
+        Map<String, Object> contextMap = new LinkedHashMap<>();
 
-        // Preencha as informações de imports Java
-        List<String> javaImports = new ArrayList<>();
-        while (true) {
-            System.out.print("Vamos iniciar colocando os Imports");
-            System.out.print("Import Java (ex: import org.example.SomeClass;): ");
-            String importStatement = scanner.nextLine();
-            if (importStatement.isEmpty()) {
-                break;
-            }
-            javaImports.add(importStatement);
+        // Imports section
+        System.out.println("Insira os imports do Java (linha vazia encerra o campo):");
+        List<String> imports = new ArrayList<>();
+        String line;
+        while (!(line = scanner.nextLine()).isEmpty()) {
+            imports.add(line);
         }
-        imports.put("java", javaImports);
+        Map<String, List<String>> importsMap = new LinkedHashMap<>();
+        importsMap.put("java", imports);
+        contextMap.put("imports", importsMap);
 
-        // Preencha as informações do contexto
-        System.out.print("Coloque a URL da fonte");
-        System.out.print("URL da fonte (ex: https://www.google.com/): ");
-        String url = scanner.nextLine();
-        source.put("url: ", url);
-        source.put("language", "pt-br: ");
+        // Source section
+        Map<String, String> sourceMap = new LinkedHashMap<>();
+        System.out.println("Insira a URL:");
+        sourceMap.put("url", scanner.nextLine());
+        System.out.println("Insira a linguagem da pagina HTML:");
+        sourceMap.put("language", scanner.nextLine());
+        System.out.println("Insira o conteúdo HTML:");
+        sourceMap.put("html", scanner.nextLine());
+        contextMap.put("source", sourceMap);
 
-        // Preencha informações sobre intenções
-        while (true) {
-            Map<String, Object> intent = new HashMap<>();
-            System.out.print("Preencha informações sobre intents");
-            System.out.print("Intent: ");
-            String intentName = scanner.nextLine();
-            intent.put("intent: ", intentName);
+        // Intents section
+        List<Map<String, Object>> intentsList = new ArrayList<>();
+        boolean addMoreIntents;
+        do {
+            Map<String, Object> intentMap = new LinkedHashMap<>();
+            System.out.println("Insira o intent:");
+            intentMap.put("intent", scanner.nextLine());
+            System.out.println("Insira o intent-generated :");
+            intentMap.put("intent-generated", scanner.nextLine());
 
-            System.out.print("IntentGenerated: ");
-            String intentGenerated = scanner.nextLine();
-            intent.put("intent-generated: ", intentGenerated);
-
-            Map<String, Object> code = new HashMap<>();
-            Map<String, Object> selenium = new HashMap<>();
+            // Code section
+            Map<String, List<String>> seleniumMap = new LinkedHashMap<>();
+            System.out.println("Insira o codigo Java com Selenium (linha vazia encerra o campo):");
             List<String> javaCode = new ArrayList<>();
-            System.out.print("Preencha informações sobre o codigo java feito com selenium");
-            System.out.println("código java ex: driver.findElement(By.id(\"APjFqb\")).sendKeys(\"atlantico\"); apenas de enter para finalizar: ");
-            while (true) {
-                String javaLine = scanner.nextLine();
-                if (javaLine.isEmpty()) {
-                    break;
-                }
-                javaCode.add(javaLine);
+            while (!(line = scanner.nextLine()).isEmpty()) {
+                javaCode.add(line);
             }
-            selenium.put("java: ", javaCode);
-            code.put("selenium: ", selenium);
-            intent.put("code: ", code);
+            seleniumMap.put("java", javaCode);
+            Map<String, Map<String, List<String>>> codeMap = new LinkedHashMap<>();
+            codeMap.put("selenium", seleniumMap);
+            intentMap.put("code", codeMap);
 
-            Map<String, Object> entities = new HashMap<>();
-            List<Map<String, Object>> target = new ArrayList<>();
-            System.out.print("Preencha informações sobre entities");
-            System.out.print("Entities - Target ex: By.id: APjFqb: ");
-            String entityType = scanner.nextLine();
-            Map<String, Object> targetEntity = new HashMap<>();
-            targetEntity.put(entityType, scanner.nextLine());
-            target.add(targetEntity);
-            entities.put("target: ", target);
-
-            entities.put("related: ", new ArrayList<>());
-            entities.put("values: ", new HashMap<>());
-            intent.put("entities: ", entities);
-
-            intents.add(intent);
-
-            System.out.print("Deseja adicionar outra intenção? (s = sim/n = não): ");
-
-            String addAnotherIntent = scanner.nextLine();
-            if (!addAnotherIntent.equalsIgnoreCase("s")) {
-                break;
+            // Entities section
+            Map<String, List<String>> entitiesMap = new LinkedHashMap<>();
+            System.out.println("Insira o target entities (linha vazia encerra o campo):");
+            List<String> targets = new ArrayList<>();
+            while (!(line = scanner.nextLine()).isEmpty()) {
+                targets.add(line);
             }
+            entitiesMap.put("target", targets);
+            entitiesMap.put("related", new ArrayList<>()); // If related entities needed, you can add here similarly.
+            intentMap.put("entities", entitiesMap);
+
+            intentMap.put("values", new LinkedHashMap<>());
+
+            intentsList.add(intentMap);
+
+            System.out.println("Deseja inserir outro intent? (yes/no):");
+            addMoreIntents = "yes".equalsIgnoreCase(scanner.nextLine());
+        } while (addMoreIntents);
+
+        Map<String, Object> context = new LinkedHashMap<>();
+        context.put("context", contextMap);
+        contextMap.put("intents", intentsList);
+
+        // Convert to JSON String
+        String jsonString = toJsonString(context);
+        System.out.println(jsonString);
+    }
+
+    private static String toJsonString(Map<String, Object> map) {
+        StringBuilder json = new StringBuilder();
+        json.append("{\n");
+        Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, Object> entry = it.next();
+            json.append(quote(entry.getKey())).append(": ");
+            if (entry.getValue() instanceof String) {
+                json.append(quote(entry.getValue().toString()));
+            } else if (entry.getValue() instanceof Map) {
+                json.append(toJsonString((Map<String, Object>) entry.getValue()));
+            } else if (entry.getValue() instanceof List) {
+                json.append(toJsonList((List<?>) entry.getValue()));
+            } else {
+                json.append(entry.getValue().toString());
+            }
+            if (it.hasNext()) json.append(",");
+            json.append("\n");
         }
+        json.append("}\n");
+        return json.toString();
+    }
 
-        // Construa o contexto completo
-        context.put("imports: ", imports);
-        context.put("source: ", source);
-        context.put("intents: ", intents);
+    private static String toJsonList(List<?> list) {
+        StringBuilder json = new StringBuilder();
+        json.append("[\n");
+        Iterator<?> it = list.iterator();
+        while (it.hasNext()) {
+            Object item = it.next();
+            if (item instanceof String) {
+                json.append(quote(item.toString()));
+            } else if (item instanceof Map) {
+                json.append(toJsonString((Map<String, Object>) item));
+            } else {
+                json.append(item.toString());
+            }
+            if (it.hasNext()) json.append(",");
+            json.append("\n");
+        }
+        json.append("]");
+        return json.toString();
+    }
 
-        // Construa o JSON completo
-        Map<String, Object> json = new HashMap<>();
-        json.put("context: ", context);
-
-        // Exiba o JSON gerado no formato esperado
-        System.out.println("{");
-        System.out.println("    \"context\": {");
-        System.out.println("        \"imports\": " + imports + ",");
-        System.out.println("        \"source\": " + source + ",");
-        System.out.println("        \"intents\": " + intents);
-        System.out.println("    }");
-        System.out.println("}");
+    private static String quote(String string) {
+        return "\"" + string.replace("\"", "\\\"") + "\"";
     }
 }
-

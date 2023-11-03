@@ -9,4 +9,12 @@
 
 - Objetivo: JSON será utilizado como modelo para alimentar a IA;
 
+Descrição matematica do Json referido
+
+- Dentro do conjunto context existem sub conjuntos sendo em sequencia: import, source e intents
+- Dentro de intents exitem subconjuntos sendo na sequencia: intent, intent-generated, code, entities e values.
+- Dentro do subconjunto intents a estrutura de subconjuntos pode se repetir em um laço de repetição.
+- No sub conjunto code exite um subconjunto dentro dele chamado selenium que tambem possui um subconjunto chamado java.
+- No subconjunto entities exitem dois subconjuntos chamados target e related
+
 
