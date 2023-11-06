@@ -1,100 +1,87 @@
-package org.json;
-
-import java.util.*;
 import java.io.*;
-
+import java.util.*;
+//não funciona
 public class JSONLGenerator {
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        // Create a LinkedHashMap to maintain the order of insertion
-        LinkedHashMap<String, Object> contextMap = new LinkedHashMap<>();
-        LinkedHashMap<String, Object> importsMap = new LinkedHashMap<>();
-        LinkedHashMap<String, Object> sourceMap = new LinkedHashMap<>();
+        LinkedHashMap<String, Object> context = new LinkedHashMap<>();
+        LinkedHashMap<String, Object> imports = new LinkedHashMap<>();
+        LinkedHashMap<String, Object> source = new LinkedHashMap<>();
         ArrayList<LinkedHashMap<String, Object>> intentsList = new ArrayList<>();
 
-        // Read imports
-        ArrayList<String> importsList = new ArrayList<>();
+        // Read Java imports
+        ArrayList<String> javaImports = new ArrayList<>();
         System.out.println("Enter Java imports (type 'end' to finish):");
-        while(scanner.hasNext()) {
-            String importEntry = scanner.nextLine();
-            if("end".equalsIgnoreCase(importEntry)) {
+        while (true) {
+            String javaImport = scanner.nextLine();
+            if ("end".equalsIgnoreCase(javaImport)) {
                 break;
             }
-            importsList.add(importEntry);
+            javaImports.add(javaImport);
         }
-        importsMap.put("java", importsList);
+        imports.put("java", javaImports);
 
-        // Read source
+        // Read source details
         System.out.println("Enter source URL:");
-        String sourceUrl = scanner.nextLine();
+        source.put("url", scanner.nextLine());
         System.out.println("Enter source language:");
-        String sourceLanguage = scanner.nextLine();
+        source.put("language", scanner.nextLine());
         System.out.println("Enter source HTML:");
-        String sourceHtml = scanner.nextLine();
-        sourceMap.put("url", sourceUrl);
-        sourceMap.put("language", sourceLanguage);
-        sourceMap.put("html", sourceHtml);
+        source.put("html", scanner.nextLine());
 
         // Read intents
-        while(true) {
-            LinkedHashMap<String, Object> intentMap = new LinkedHashMap<>();
+        while (true) {
+            LinkedHashMap<String, Object> intent = new LinkedHashMap<>();
             System.out.println("Enter intent (type 'end' to finish):");
-            String intent = scanner.nextLine();
-            if("end".equalsIgnoreCase(intent)) {
+            String intentName = scanner.nextLine();
+            if ("end".equalsIgnoreCase(intentName)) {
                 break;
             }
-            intentMap.put("intent", intent);
+            intent.put("intent", intentName);
 
             System.out.println("Enter intent-generated:");
-            String intentGenerated = scanner.nextLine();
-            intentMap.put("intent-generated", intentGenerated);
+            intent.put("intent-generated", scanner.nextLine());
 
-            LinkedHashMap<String, Object> codeMap = new LinkedHashMap<>();
-            LinkedHashMap<String, Object> seleniumMap = new LinkedHashMap<>();
-            System.out.println("Enter Java code for Selenium (type 'end' to finish):");
-            ArrayList<String> seleniumCodeList = new ArrayList<>();
-            while(scanner.hasNext()) {
-                String codeEntry = scanner.nextLine();
-                if("end".equalsIgnoreCase(codeEntry)) {
+            LinkedHashMap<String, Object> code = new LinkedHashMap<>();
+            LinkedHashMap<String, Object> selenium = new LinkedHashMap<>();
+            ArrayList<String> javaCode = new ArrayList<>();
+            System.out.println("Enter Java code with Selenium (type 'end' to finish):");
+            while (true) {
+                String codeLine = scanner.nextLine();
+                if ("end".equalsIgnoreCase(codeLine)) {
                     break;
                 }
-                seleniumCodeList.add(codeEntry);
+                javaCode.add(codeLine);
             }
-            seleniumMap.put("java", seleniumCodeList);
-            codeMap.put("selenium", seleniumMap);
+            selenium.put("java", javaCode);
+            code.put("selenium", selenium);
+            intent.put("code", code);
 
-            intentMap.put("code", codeMap);
-
-            LinkedHashMap<String, Object> entitiesMap = new LinkedHashMap<>();
-            System.out.println("Enter target (type 'end' to finish):");
-            ArrayList<String> targetList = new ArrayList<>();
-            while(scanner.hasNext()) {
-                String targetEntry = scanner.nextLine();
-                if("end".equalsIgnoreCase(targetEntry)) {
+            LinkedHashMap<String, Object> entities = new LinkedHashMap<>();
+            ArrayList<String> targetEntities = new ArrayList<>();
+            System.out.println("Enter target entities (type 'end' to finish):");
+            while (true) {
+                String targetEntity = scanner.nextLine();
+                if ("end".equalsIgnoreCase(targetEntity)) {
                     break;
                 }
-                targetList.add(targetEntry);
+                targetEntities.add(targetEntity);
             }
-            entitiesMap.put("target", targetList);
+            entities.put("target", targetEntities);
+            entities.put("related", new ArrayList<>()); // Related entities are assumed to be empty
+            intent.put("entities", entities);
+            intent.put("values", new LinkedHashMap<>()); // Values are assumed to be empty
 
-            ArrayList<String> relatedList = new ArrayList<>(); // Assuming 'related' is always an empty list
-            entitiesMap.put("related", relatedList);
-
-            intentMap.put("entities", entitiesMap);
-
-            intentMap.put("values", new LinkedHashMap<>()); // Assuming 'values' is always an empty map
-
-            intentsList.add(intentMap);
+            intentsList.add(intent);
         }
 
-        // Assemble the JSON structure
-        contextMap.put("imports", importsMap);
-        contextMap.put("source", sourceMap);
-        contextMap.put("intents", intentsList);
+        context.put("imports", imports);
+        context.put("source", source);
+        context.put("intents", intentsList);
 
-        // Convert the map to JSON String
-        String jsonString = toJsonString(contextMap);
+        // Convert the context map to JSON String
+        String jsonString = toJsonString(context);
 
         // Print the JSON String in one single line
         String singleLineJson = jsonString.replaceAll("\n", "").replaceAll("\\s+", " ");
@@ -107,7 +94,6 @@ public class JSONLGenerator {
         scanner.close();
     }
 
-    // Method to convert a map to JSON String
     private static String toJsonString(Map<String, Object> map) {
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("{\n");
@@ -120,7 +106,7 @@ public class JSONLGenerator {
                 ((List<?>) value).forEach(item -> {
                     jsonBuilder.append("\t\t\"").append(item).append("\",\n");
                 });
-                if(!((List<?>) value).isEmpty()) {
+                if (!((List<?>) value).isEmpty()) {
                     jsonBuilder.setLength(jsonBuilder.length() - 2); // Remove last comma and newline
                 }
                 jsonBuilder.append("\n\t],\n");
@@ -128,16 +114,14 @@ public class JSONLGenerator {
                 jsonBuilder.append("\"").append(value).append("\",\n");
             }
         });
-        if(!map.isEmpty()) {
+        if (!map.isEmpty()) {
             jsonBuilder.setLength(jsonBuilder.length() - 2); // Remove last comma and newline
         }
         jsonBuilder.append("\n}");
         return jsonBuilder.toString();
     }
 
-    // Method to write String data to file
     private static void writeToFile(String data, String fileName) {
-        // Ajuste o caminho para um local seguro, como o diretório temporário do sistema
         String tempDirectoryPath = System.getProperty("java.io.tmpdir");
         File outputFile = new File(tempDirectoryPath, fileName);
 
@@ -148,6 +132,4 @@ public class JSONLGenerator {
             System.out.println("An error occurred while writing to the file: " + e.getMessage());
         }
     }
-
 }
-

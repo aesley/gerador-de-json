@@ -1,8 +1,11 @@
 package org.json;
-// Finalizado
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
-public class JSONGenerator {
+public class JSONGeneratortxt {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Map<String, Object> contextMap = new LinkedHashMap<>();
@@ -76,6 +79,12 @@ public class JSONGenerator {
         // Convert to JSON String
         String jsonString = toJsonString(context);
         System.out.println(jsonString);
+
+        // Write to a text file
+        writeToFile("output.txt", jsonString);
+
+        // Close the scanner
+        scanner.close();
     }
 
     private static String toJsonString(Map<String, Object> map) {
@@ -123,5 +132,15 @@ public class JSONGenerator {
 
     private static String quote(String string) {
         return "\"" + string.replace("\"", "\\\"") + "\"";
+    }
+
+    private static void writeToFile(String fileName, String content) {
+        try (PrintWriter writer = new PrintWriter(new FileWriter(fileName))) {
+            writer.print(content);
+            System.out.println("JSON saved to " + fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error writing to file: " + e.getMessage());
+        }
     }
 }
